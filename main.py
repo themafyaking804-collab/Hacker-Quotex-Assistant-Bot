@@ -2,12 +2,13 @@
 #               H A C K E R   T R A D E R   A S S I S T A N T
 # ==============================================================================
 # Brand: HACKER VIP TRADING BOT
-# Version: 1.0 Quotex Assistant Edition
+# Version: 1.1 Stable Crash-Free Edition
 # ==============================================================================
 
 import os
 import json
 import logging
+import time
 import telebot
 from telebot import types
 
@@ -18,7 +19,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("HACKER_ASSISTANT_BOT")
 
-# --- CREDENTIALS FROM SCREENSHOT ---
+# --- CREDENTIALS ---
 BOT_TOKEN = "8854893422:AAET-ureA2Nqx_-133Dh4YknUnOFIx5QVsw"
 SUPPORT_USERNAME = "HACKERRR_OFFICIAL"
 QUOTEX_LINK = "https://broker-qx.pro/?lid=2382183"
@@ -117,7 +118,10 @@ def handle_callbacks(call):
             types.InlineKeyboardButton("📩 SEND TRADER ID HERE", callback_data="send_id"),
             types.InlineKeyboardButton("◀️ BACK", callback_data="back_home")
         )
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=markup, disable_web_page_preview=True)
+        try:
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=markup, disable_web_page_preview=True)
+        except Exception:
+            pass
 
     elif data == "create_acc":
         text = (
@@ -130,7 +134,10 @@ def handle_callbacks(call):
             "6️⃣ Then go to your profile and verify with documents (Identity card).\n\n"
             "✅ **Done! Your account is ready to deposit.**"
         )
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=back_menu_markup(), disable_web_page_preview=True)
+        try:
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=back_menu_markup(), disable_web_page_preview=True)
+        except Exception:
+            pass
 
     elif data == "delete_acc":
         text = (
@@ -141,7 +148,10 @@ def handle_callbacks(call):
             "4️⃣ Click on the link you received on email - account is deleted successfully.\n\n"
             "💡 **Now you can register a fresh account using our affiliate link.**"
         )
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=back_menu_markup())
+        try:
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=back_menu_markup())
+        except Exception:
+            pass
 
     elif data == "vip_pics":
         text = (
@@ -152,14 +162,20 @@ def handle_callbacks(call):
         markup = types.InlineKeyboardMarkup()
         markup.add(types.InlineKeyboardButton("🔥 JOIN NOW OUR VIP", url=QUOTEX_LINK))
         markup.add(types.InlineKeyboardButton("◀️ BACK", callback_data="back_home"))
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=markup, disable_web_page_preview=True)
+        try:
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=markup, disable_web_page_preview=True)
+        except Exception:
+            pass
 
     elif data == "send_id":
         user_states[user_id] = 'awaiting_trader_id'
         text = "📝 **Please Send Your Trader Id Here:**\n*(Type your ID in chat and send)*"
         markup = types.InlineKeyboardMarkup()
         markup.add(types.InlineKeyboardButton("❌ CANCEL", callback_data="back_home"))
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=markup)
+        try:
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=markup)
+        except Exception:
+            pass
 
 # --- TEXT HANDLER FOR TRADER ID ---
 
@@ -195,5 +211,10 @@ def receive_trader_id(message):
 
 if __name__ == "__main__":
     logger.info("Hacker Trader Assistant Bot is starting...")
-    bot.remove_webhook()
-    bot.infinity_polling(skip_pending=True)
+    while True:
+        try:
+            bot.remove_webhook()
+            bot.infinity_polling(skip_pending=True, timeout=20, long_polling_timeout=20)
+        except Exception as e:
+            logger.error(f"Bot crashed with error: {e}. Restarting in 5 seconds...")
+            time.sleep(5)
